@@ -1,6 +1,18 @@
-def discwriter(discs, descriptors, filepath, ids, dosages, content):
+import cv2
+import numpy as np
+import os.path
+import math
+import copy
+from scipy import stats
+import numpy as np
+from scipy import signal
+import pickle
+
+def discwriter(discs, descriptors, filepath):
     # cnx = mysql.connector.connect(user='root', database='incubator', password = 'Letmein!')
     # connect to database
+    #The ids, dosages, and content inputs are only necassary if there is nothing in the database for something.
+    #they are arrays that correspond to the discs, i.e. dosages[0] is the dosages for disc[1], etc.
     cursor = dbh.cursor()
     cursor.execute("select abx_name from antibiotics")
     # get names
@@ -47,25 +59,3 @@ def discwriter(discs, descriptors, filepath, ids, dosages, content):
                     features.close()
                     cursor.execute("update antibiotics set abx_descriptor = " + entirepath + "where abx_id = " str(abx_id[n]))
 
-
-                    # record that you found the same path
-
-    for a in range(1, len(discs) + 1):
-        if (existance[a - 1] != 1):
-            entirepath = ''
-            # If you don't find a matching antibiotic
-            if (len(filepath) > 0):
-                entirepath = head + '/' + discs[a] + '.pkl'
-            # make a file at a given folder
-            else:
-                entirepath = discs[a] + '.pkl'
-            # make a pickle file with those descriptors in a dictionary
-            tempdict = {}
-            features = open(entirepath, "wb")
-            tempdict[0] = descriptors[a]
-            # make a new dictionary and dump it in that file
-            pickle.dump(tempdict, features)
-            features.close()
-            # push it to the database.
-            cursor.execute("insert into `antibiotics`  VALUES (" + str(ids[a]) + ", " + str(discs[a]) + ", " + str(
-                content[a]) + ", " + dosages[a] + ", " + entirepath + ")")
