@@ -858,7 +858,7 @@ def discsearcher(features):
         return (discnames)
 
 
-def discwriter(discs, descriptors, filepath, ids, dosages, content):
+def discwriter(discs, descriptors, filepath):
     # cnx = mysql.connector.connect(user='root', database='incubator', password = 'Letmein!')
     # connect to database
     #The ids, dosages, and content inputs are only necassary if there is nothing in the database for something.
@@ -910,38 +910,5 @@ def discwriter(discs, descriptors, filepath, ids, dosages, content):
                     cursor.execute("update antibiotics set abx_descriptor = " + entirepath + "where abx_id = " str(abx_id[n]))
 
 
-                    # record that you found the same path
-
-    for a in range(1, len(discs) + 1):
-        if (existance[a - 1] != 1):
-            entirepath = ''
-            # If you don't find a matching antibiotic
-            if (len(filepath) > 0):
-                entirepath = head + '/' + discs[a] + '.pkl'
-            # make a file at a given folder
-            else:
-                entirepath = discs[a] + '.pkl'
-            # make a pickle file with those descriptors in a dictionary
-            tempdict = {}
-            features = open(entirepath, "wb")
-            tempdict[0] = descriptors[a]
-            # make a new dictionary and dump it in that file
-            pickle.dump(tempdict, features)
-            features.close()
-            # push it to the database.
-            cursor.execute("insert into `antibiotics`  VALUES (" + str(ids[a]) + ", " + str(discs[a]) + ", " + str(
-                content[a]) + ", " + dosages[a] + ", " + entirepath + ")")
-
-
-            # testimg = 'discsfoundimage2018-07-03_07-36-04-staph-a.jpg'
-
-            # zoneimage, zonedists = zonefinder(testimg)
-            # print(zoneimage, zonedists)
-            # newimg, disc_coordinates, discimages, discmasks = locatediscs(testimg)
-            # newpath = circledrawer(testimg, zonedists, disc_coordinates)
-            # features = featurefinder(discimages, discmasks)
-            # foundones = discsearcher(features)
-
-
-            # Methods declaration
+                    # record that you found the same pat
 
