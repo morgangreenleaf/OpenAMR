@@ -70,23 +70,17 @@ def new_abx_code(_id, newvalues):
     discs = funcall.find_discs(rgb_img)
     descriptors_dir = Path(r'descriptors')  # saved features used in abx_key
     abx_names = funcall.search_discs(rgb_img, discs)
-    # new_abx = {}
-    # val = _id
+
     val = "0" + str(_id) if _id < 10 else _id
     features_path = descriptors_dir / f'{val}.npz'
     filepath = "abx_key.txt"
-    #
-    # print(newvalues)dictionary_of_association_from_database[dt]["resistance"]
-    # print(abx_names)
 
-    createnumyarr = False
     new_abx = {}
     for d in abx_names:
         new_abx[d] = (newvalues[d], abx_names[d][1])
     for i in abx_names:
         if newvalues[i] != abx_names[i][0]:
-            createnumyarr = True
-            if createnumyarr:
+            while True:
                 for i in abx_names:
                     with open(filepath, "a+") as file_handler:
                         file_handler.write(str(val) + '_' + str(i) + '  ' + newvalues[i] + '\n')
@@ -95,7 +89,6 @@ def new_abx_code(_id, newvalues):
                 features = funcall.find_features(rgb_img, discs)
                 funcall.save_features(features, features_path)
                 break
-    createnumyarr = False
 
     print("New Match Duration", (datetime.datetime.now() - starttime).seconds, "sec")
 
@@ -288,17 +281,7 @@ def process_img():
     print()
 
 
-if __name__ == '__main__':
-
-    imglocationhome = "assets/img/"
-    url = "http://localhost:8085/open-amr/"
-    cwdpath = "php-scripts/"
-    domain = url + cwdpath
-    imgurl = url + "img/tryimg.png"
-    set_test_phase(4)
-    test_id = 0
-    imgbase = "assets/testfiles/"
-    file = "tryimg"
+def main_function():
     while True:
         try:
             getStatus = requestpost("getTestStatus", {})
@@ -310,3 +293,16 @@ if __name__ == '__main__':
                         process_img()
         except Exception as e_start:
             exceptionprint("Main process", e_start)
+
+
+if __name__ == '__main__':
+    imglocationhome = "assets/img/"
+    url = "http://localhost:8085/open-amr/"
+    cwdpath = "php-scripts/"
+    domain = url + cwdpath
+    imgurl = url + "img/tryimg.png"
+    # set_test_phase(0)
+    test_id = 0
+    imgbase = "assets/testfiles/"
+    file = "tryimg"
+    main_function()

@@ -590,6 +590,7 @@ def start_test():
                         generals[12]["state"] = "enabled"
                         generals[12].bind("<Button-1>", lambda e: anproceed())
 
+            # noinspection PyShadowingNames
             def change_antibiotic_name(antibiotic_name, dictionary_of_antibiotics):
                 def bacteria_change():
                     global abxname, dictionary_of_antibiotic_discs_from_database
@@ -678,8 +679,6 @@ def start_test():
 
                 for _, _a in dictionary_of_antibiotic_discs_from_database.items():
                     insertlist.append(_a.split(" -")[0])
-
-                # print(insertlist)
 
                 try:
                     if not http_request_return_json_or_boolean(file="insertTestData0",
@@ -944,9 +943,6 @@ def start_test():
                                 l = list(dictionary_of_discs_from_database[_d])
                                 l[3] = di[0]
                                 dictionary_of_discs_from_database[_d] = tuple(l)
-
-                            # 0: (Chloramphenicol', 'C30', '30ug', 6, bacteria-12, abx-3')
-                            # print(dictionary_of_discs_from_database)
 
                             global_top_window_tkinter.destroy()
                             threading.Thread(target=singleTestProgressing,
@@ -1454,10 +1450,7 @@ def start_test():
     cal.Label(global_top_window_tkinter_sp, text="Scan accession number").pack(pady=10)
     startTestFrame = cal.Frame(global_top_window_tkinter_sp, padding=20, relief=SOLID)
     entryField = Entry(startTestFrame, width=dimensionWidth, justify="center")
-    # entryField.bind("<Return>",
-    #                 lambda e: wait_for_image_capture() if entryField.get() != "" else lambda e,
-    #                                                                                          event=entryField: clear_Input(
-    #                     event))
+
     entryField.pack(ipady=9)
     entryField.focus()
     optButtons = cal.Frame(startTestFrame)
