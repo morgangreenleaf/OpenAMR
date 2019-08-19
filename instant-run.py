@@ -202,7 +202,7 @@ def http_request_return_json_or_boolean(file, param, return_data=True):
 
 def set_window_icon_and_make_fullscreen(window):
     # window.state("zoomed")
-    #window.attributes('-fullscreen', True)
+    # window.attributes('-fullscreen', True)
     try:
         window.iconbitmap(icoloc)
     except Exception as e_win:
@@ -365,7 +365,7 @@ def result_report():
                 padx=3,
                 anchor="w")
             generalOpt[i + 20] = cal.Label(resultFrame,
-                                           text=str(dictionary_of_discs_from_database[dt][3]) +"mm",
+                                           text=str(dictionary_of_discs_from_database[dt][3]) + "mm",
                                            width=6)
             generalOpt[i + 20].pack(side="left", padx=3, anchor="w")
             cal.Label(resultFrame, text=dictionary_of_association_from_database[dt]["resistance"],
@@ -527,7 +527,7 @@ def result_report():
     listViewFrame = cal.Frame(abxFrame)
     scrollbar = Scrollbar(listViewFrame)
     scrollbar.pack(side=RIGHT, fill=Y, ipadx=dimensionPadding)
-    anListbox = Listbox(listViewFrame, width=dimensionWidth ,font = ('TkDefaultFont',48), height=8,
+    anListbox = Listbox(listViewFrame, width=dimensionWidth, font=('TkDefaultFont', listfont), height=listheight,
                         yscrollcommand=scrollbar.set)
     listboxupdate(s_list, anListbox, False)
     scrollbar.config(command=anListbox.yview)
@@ -626,7 +626,7 @@ def start_test():
                 anEntry.pack(ipady=10, pady=10)
                 listViewFrame = cal.Frame(abxFrame)
                 scrollbar = Scrollbar(listViewFrame)
-                anListbox = Listbox(listViewFrame,width=dimensionWidth ,font = ('TkDefaultFont',48), height=8,
+                anListbox = Listbox(listViewFrame, width=dimensionWidth, font=('TkDefaultFont', listfont), height=listheight,
                                     yscrollcommand=scrollbar.set)
                 scrollbar.pack(side=RIGHT, fill=Y, ipadx=dimensionPadding)
                 scrollbar.config(command=anListbox.yview)
@@ -638,10 +638,11 @@ def start_test():
                 anListbox.bind("<Double-Button-1>", lambda e: bacteria_change())
                 anListbox.bind("<Return>", lambda e: bacteria_change())
                 anListbox.pack()
-                cal.Button(abxFrame, image=backImg, padding=dimensionPadding, command=global_top_window_tkinter.destroy).pack(
+                cal.Button(abxFrame, image=backImg, padding=dimensionPadding,
+                           command=global_top_window_tkinter.destroy).pack(
                     side=LEFT, pady=10)
                 cal.Button(abxFrame, image=okImg, padding=dimensionPadding, command=bacteria_change).pack(side=RIGHT,
-                                                                                            pady=10)
+                                                                                                          pady=10)
                 anEntry.pack()
                 abxFrame.pack()
 
@@ -726,11 +727,11 @@ def start_test():
                     i = 0
                     generalOpt = {}
 
-                    try:
-                        btns[0]["state"] = "enabled"
-                        btns[1]["state"] = "enabled"
-                    except Exception as _wd:
-                        exceptionprint("widgets", _wd)
+                    # try:
+                    #     btns[0]["state"] = "enabled"
+                    #     btns[1]["state"] = "enabled"
+                    # except Exception as _wd:
+                    #     exceptionprint("widgets", _wd)
 
                     for dt in dictionary_of_discs_from_database:
                         resultFrame = cal.Frame(cFrame, padding=5, relief=SOLID)
@@ -937,14 +938,10 @@ def start_test():
                         generals[g + 4] = cal.Button(bFrame, image=minusImg, width=20, padding=dimensionPadding)
                         generals[g + 4].bind("<Button-1>",
                                              lambda event: cAdjust(generals[g + 2].get(), generals[g + 5].get(), False))
-                        
+
                         generals[g + 4].pack(side=LEFT, padx=2)
                         generals[g + 2].pack(pady=10, ipady=3, padx=20, side=LEFT)
                         generals[g + 3].pack(side=LEFT, padx=2)
-                        
-                        
-
-                        
 
                         # noinspection PyShadowingNames
                         def callback():
@@ -999,9 +996,11 @@ def start_test():
                         if incount:
                             threading.Thread(target=finish).start()
 
-                    cal.Button(cFrame, image=okImg, padding=dimensionPadding, command=savedata).pack(side=RIGHT, pady=10)
+                    cal.Button(cFrame, image=okImg, padding=dimensionPadding, command=savedata).pack(side=RIGHT,
+                                                                                                     pady=10)
 
-                    modify = cal.Button(cFrame, image=editImg, padding=dimensionPadding, state="disabled", command=adjustTest)
+                    modify = cal.Button(cFrame, image=editImg, padding=dimensionPadding, state="disabled",
+                                        command=adjustTest)
                     modify.pack(side=LEFT, pady=10)
 
                     newzonead = imgbase + str(global_sample_id_from_database) + "/zone_adj/" + str(
@@ -1244,8 +1243,9 @@ def start_test():
                 generals[10]["image"] = global_scale_image
 
             discOptFrame = cal.Frame(discabxFrame)
-            cal.Button(discOptFrame, image=backImg, padding=dimensionPadding, command=valHolder.destroy).pack(pady=10, padx=20,
-                                                                                                side=LEFT)
+            cal.Button(discOptFrame, image=backImg, padding=dimensionPadding, command=valHolder.destroy).pack(pady=10,
+                                                                                                              padx=20,
+                                                                                                              side=LEFT)
             cal.Button(discOptFrame, text="Brighten Image", padding=dimensionPadding,
                        command=lambda: threading.Thread(target=brightImg).start()).pack(pady=10, side=LEFT)
 
@@ -1363,6 +1363,13 @@ def start_test():
                                         imageprocessdone()
                                         threading_value = False
                                         break
+                            elif state["started"] == "5":
+                                generalOpt[2]["text"] = "Oops! Something went wrong, please try again"
+                                threading_value = False
+                                time.sleep(5)
+                                global isolatewindow
+                                isolatewindow.destroy()
+
                     except Exception as e_df:
                         exceptionprint("discsfound image", e_df)
 
@@ -1396,8 +1403,8 @@ def start_test():
         listViewFrame = cal.Frame(isoSelectFrame)
         scrollbar = Scrollbar(listViewFrame)
         scrollbar.pack(side=RIGHT, fill=Y, ipadx=dimensionPadding)
-        #font = ('TkDefaultFont',40),
-        isolateListBox = Listbox(listViewFrame, width=dimensionWidth ,font = ('TkDefaultFont',48), height=8, 
+        # font = ('TkDefaultFont',40),
+        isolateListBox = Listbox(listViewFrame, width=dimensionWidth, font=('TkDefaultFont', listfont), height=listheight,
                                  yscrollcommand=scrollbar.set)
         listboxupdate(isolate_list_from_database, isolateListBox)
         scrollbar.config(command=isolateListBox.yview)
@@ -1405,13 +1412,14 @@ def start_test():
         isolateEntry.bind("<KeyRelease>", lambda e, box=isolateListBox: toListbox(e, box, isolate_list_from_database))
         isolateListBox.bind("<<ListboxSelect>>", lambda event, efield=isolateEntry: itemselected(event, efield, True))
         isolateListBox.pack()
-        generalOpt = {i: cal.Button(isoSelectFrame, image=backImg, padding=dimensionPadding, command=isolatewindow.destroy),
-                      i + 1: cal.Button(isoSelectFrame, image=proceedImg, padding=dimensionPadding),
-                      i + 2: Label(isoSelectFrame, text="Preparing for zone detection"),
-                      i + 3: cal.Button(isoSelectFrame, image=okImg, padding=dimensionPadding, command=proceedtophoto),
-                      i + 4: cal.Button(isoSelectFrame, image=backImg, padding=dimensionPadding,
-                                        command=global_top_window_tkinter.destroy)
-                      }
+        generalOpt = {
+            i: cal.Button(isoSelectFrame, image=backImg, padding=dimensionPadding, command=isolatewindow.destroy),
+            i + 1: cal.Button(isoSelectFrame, image=proceedImg, padding=dimensionPadding),
+            i + 2: Label(isoSelectFrame, text="Preparing for zone detection"),
+            i + 3: cal.Button(isoSelectFrame, image=okImg, padding=dimensionPadding, command=proceedtophoto),
+            i + 4: cal.Button(isoSelectFrame, image=backImg, padding=dimensionPadding,
+                              command=global_top_window_tkinter.destroy)
+            }
         generalOpt[i + 2].pack(pady=10)
         isoSelectFrame.pack()
         threadInstance = threading.Thread(target=bgProccessThread)
@@ -1459,11 +1467,11 @@ def start_test():
                     isolate_list_from_database = list(set(listTemp))
 
                     #  Skip Pi camera trigger
-                    #set_test_phase(1, started=True)
-                    #proceedtophoto()
+                    set_test_phase(1, started=True)
+                    proceedtophoto()
 
                     # Pi camera trigger
-                    threading.Thread(target=picamera).start()
+                    # threading.Thread(target=picamera).start()
 
                     break
                 except Exception as e_:
@@ -1538,7 +1546,7 @@ if __name__ == '__main__':
     dictionary_of_association_from_database = {}
 
     cwdpath = "php-scripts/"
-    url = "http://localhost/open-amr/"
+    url = "http://localhost:8085/open-amr/"
     domain = url + cwdpath
     imgurl = domain + "img/_discsfound_tryimg.png"
     discs_table = """ CREATE TABLE IF NOT EXISTS discs (
@@ -1556,9 +1564,14 @@ if __name__ == '__main__':
     sQLitQuery(zones_table)
 
     base = Tk()
-    base.title("Open-AMR Susceptibility Testing - Debug")
+    base.title("Open-AMR Susceptibility Testing")
     font = nametofont("TkDefaultFont")
+
     font.configure(size=37)
+    listfont = 48
+    listheight = 8
+    # dimensionWidth, dimensionPadding = 30, 20
+
     base.option_add("*Font", font)
 
     # Image home directory

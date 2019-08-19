@@ -155,6 +155,7 @@ def dowload_img():
             downloadimg = np.asarray(bytearray(imgrequest.read()), dtype=np.uint8)
             downimg = cv2.imdecode(downloadimg, -1)
             cv2.imwrite("tryimg.png", downimg)
+            # cv2.imwrite("tryimg.png", cv2.resize(cv2.imread("tryimg.png", ), (0, 0), fx=.5, fy=.5))
             return
         except Exception as e_im:
             exceptionprint("locateImgdisc", e_im)
@@ -271,6 +272,7 @@ def process_img():
 
 
 def main_function():
+    errcond = 0
     while True:
         try:
             getStatus = requestpost("getTestStatus", {})
@@ -283,17 +285,22 @@ def main_function():
                     elif state["status"] == "7":
                         new_abx_code()
         except Exception as e_start:
+            errcond += 1
+            if errcond == 5:
+                set_test_started(5, started=True)
+                errcond = 0
             exceptionprint("Main process", e_start)
 
 
 if __name__ == '__main__':
     imglocationhome = "assets/img/"
-    url = "http://localhost/open-amr/"
+    url = "http://localhost:8085/open-amr/"
     cwdpath = "php-scripts/"
     domain = url + cwdpath
     imgurl = url + "img/tryimg.png"
-    set_test_phase(8)
-    set_test_started(0, started=True)
+    # reset to default
+    # set_test_phase(8)
+    # set_test_started(1, started=True)
     test_id = 0
     imgbase = "assets/testfiles/"
     file = "tryimg"
