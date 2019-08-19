@@ -23,6 +23,12 @@ def requestpost(filename, param):
 
 
 # noinspection PyUnusedLocal
+def set_test_started(status, filename="setTestStarted", started=False):
+    if started:
+        returnTrue(filename, {"started": status})
+
+
+# noinspection PyUnusedLocal
 def set_test_phase(status, filename="setTestStatus", cond=False):
     value = "prog"
     if cond:
@@ -60,7 +66,17 @@ def get_test_id():
             exceptionprint("get_id", e_t)
 
 
-def new_abx_code(_id, newvalues):
+# noinspection PyShadowingNames
+def new_abx_code():
+    set_test_phase(8)
+    newvalues = {}
+    _id = get_test_id() - 1
+    getTestant = requestpost("getAntibioticsToProcess", {"sample_id": test_id})
+    if getTestant.status_code != 200:
+        transactionReset()
+    elif getTestant.status_code == 200:
+        for _k, ant in enumerate(getTestant.json()["abx_name_obj"]):
+            newvalues[_k] = ant["abx_code"]
     starttime = datetime.datetime.now()
     raw_dir = Path(r'' + imgbase + str(_id) + '/raw')  # raw input images
     raw_path = raw_dir / 'tryimg.png'
@@ -70,7 +86,6 @@ def new_abx_code(_id, newvalues):
     discs = funcall.find_discs(rgb_img)
     descriptors_dir = Path(r'descriptors')  # saved features used in abx_key
     abx_names = funcall.search_discs(rgb_img, discs)
-
     val = "0" + str(_id) if _id < 10 else _id
     features_path = descriptors_dir / f'{val}.npz'
     filepath = "abx_key.txt"
@@ -89,8 +104,8 @@ def new_abx_code(_id, newvalues):
                 features = funcall.find_features(rgb_img, discs)
                 funcall.save_features(features, features_path)
                 break
-
-    print("New Match Duration", (datetime.datetime.now() - starttime).seconds, "sec")
+    print("Discriptors")
+    print("Duration", (datetime.datetime.now() - starttime).seconds, "sec")
 
 
 def locatediscs(_id):
@@ -201,6 +216,8 @@ def locateImgdisc():
     set_test_phase(1, cond=True)
     print("================")
     print()
+    set_test_started(2, started=True)
+    process_img()
 
 
 def process_img():
@@ -208,19 +225,11 @@ def process_img():
     test_id, discs = get_test_id(), {}
     set_test_phase(1, cond=True)
     set_test_phase(5)
-    test_id -= 1
+    # test_id -= 1
     print("================")
     starttime = datetime.datetime.now()
     print(test_id)
-    getTestant = requestpost("getAntibioticsToProcess", {"sample_id": test_id})
-    if getTestant.status_code != 200:
-        transactionReset()
-    elif getTestant.status_code == 200:
-        for _k, ant in enumerate(getTestant.json()["abx_name_obj"]):
-            discs[_k] = ant["abx_code"]
-
     print("Find zones")
-    new_abx_code(test_id, discs)
 
     raw_dir = Path(r'' + imgbase + str(test_id) + '/raw')
     zones_dir = Path(r'' + imgbase + str(test_id) + '/zones')
@@ -246,36 +255,16 @@ def process_img():
     newdis = funcall.draw_zones(rgb_zones, zones)
     funcall.save_image(rgb_zones, zones_rgb_path)
 
-    dists = {}
-
     set_test_phase(2, cond=True)
 
-    if returnTrue("deleteZoneIfFound", {"sample_id": test_id}):
-        for a in discloc:
-            returnTrue("insertTestZone",
-                       {"discs": str(discloc[a]),
-                        "sample_id": test_id})
-    for _d in newdis:
-        dists[_d] = newdis[_d]
+    returnTrue("del_zone_finder_data", {})
+    for dia, loc in zip(newdis, discloc):
+        returnTrue("set_zone_finder_data",
+                   {"diameter": (newdis[dia]),
+                    "disc_pos": str(discloc[loc])})
 
-    while True:
-        getTestdisc = requestpost("getDiscId", {"sample_id": test_id})
-        if getTestdisc.status_code == 200:
-            for dis, disc_num in zip(dists,
-                                     getTestdisc.json()["discs"]):
-                updateDiscdata = {"distances": (dists[dis]),
-                                  "sample_id": test_id,
-                                  "disc_num": disc_num["disc_id"]}
-                returnTrue("updateDisc", updateDiscdata)
-            break
-        elif getTestdisc.status_code != 200:
-            transactionReset()
-
-    shutil.copy(imgbase+str(test_id) + "/zones_rgb/" + str(test_id) + ".png",
-                imglocationhome + "zonesfoundIm" + str(test_id) + ".png")
-    set_test_phase(3, cond=True)
-    set_test_phase(6)
     set_test_phase(4, cond=True)
+    set_test_phase(6)
     print("Duration", (datetime.datetime.now() - starttime).seconds, "sec")
     print("================")
     print()
@@ -287,21 +276,24 @@ def main_function():
             getStatus = requestpost("getTestStatus", {})
             if getStatus.status_code == 200:
                 for state in getStatus.json()["teststatus"]:
-                    if state["status"] == "1":
+                    if state["started"] == "1":
                         locateImgdisc()
-                    elif state["status"] == "4":
-                        process_img()
+                    # elif state["status"] == "4":
+                    #     process_img()
+                    elif state["status"] == "7":
+                        new_abx_code()
         except Exception as e_start:
             exceptionprint("Main process", e_start)
 
 
 if __name__ == '__main__':
     imglocationhome = "assets/img/"
-    url = "http://localhost:8085/open-amr/"
+    url = "http://localhost/open-amr/"
     cwdpath = "php-scripts/"
     domain = url + cwdpath
     imgurl = url + "img/tryimg.png"
-    # set_test_phase(0)
+    set_test_phase(8)
+    set_test_started(0, started=True)
     test_id = 0
     imgbase = "assets/testfiles/"
     file = "tryimg"

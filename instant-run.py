@@ -26,7 +26,13 @@ def clear_field(field):
     field.focus()
 
 
-printpath = "sh /home/user/print.sh "
+printpath = "sh /home/open-amr/print.sh "
+
+
+# noinspection PyUnusedLocal
+def set_test_phase(status, filename="setTestStarted", started=False):
+    if started:
+        returnTrue(filename, {"started": status})
 
 
 def printtext():
@@ -196,7 +202,7 @@ def http_request_return_json_or_boolean(file, param, return_data=True):
 
 def set_window_icon_and_make_fullscreen(window):
     # window.state("zoomed")
-    # window.attributes('-fullscreen', True)
+    #window.attributes('-fullscreen', True)
     try:
         window.iconbitmap(icoloc)
     except Exception as e_win:
@@ -321,10 +327,10 @@ def result_report():
         cal.Label(generalOpt, text="Antibiotics", width=20).pack(side="left", padx=3,
                                                                  anchor="w")
         cal.Label(generalOpt, text="Code", width=7).pack(side="left", padx=3, anchor="w")
-        cal.Label(generalOpt, text="Dose", width=10).pack(side="left", padx=3, anchor="w")
-        cal.Label(generalOpt, text="Zones (mm)", width=10).pack(side="left", padx=3, anchor="w")
-        cal.Label(generalOpt, text="R<", width=5).pack(side="left", padx=3, anchor="w")
-        cal.Label(generalOpt, text="S≥", width=5).pack(side="left", padx=3, anchor="w")
+        cal.Label(generalOpt, text="Dose", width=6).pack(side="left", padx=3, anchor="w")
+        cal.Label(generalOpt, text="Zones", width=6).pack(side="left", padx=3, anchor="w")
+        cal.Label(generalOpt, text="R<", width=4).pack(side="left", padx=3, anchor="w")
+        cal.Label(generalOpt, text="S≥", width=4).pack(side="left", padx=3, anchor="w")
         cal.Label(generalOpt, text="Interpretation", width=15).pack(side="left", padx=3,
                                                                     anchor="w")
         generalOpt.pack()
@@ -354,21 +360,21 @@ def result_report():
                 anchor="w")
 
             cal.Label(resultFrame, text=str(dictionary_of_discs_from_database[dt][2]),
-                      width=10).pack(
+                      width=6).pack(
                 side="left",
                 padx=3,
                 anchor="w")
             generalOpt[i + 20] = cal.Label(resultFrame,
-                                           text=str(dictionary_of_discs_from_database[dt][3]),
-                                           width=10)
+                                           text=str(dictionary_of_discs_from_database[dt][3]) +"mm",
+                                           width=6)
             generalOpt[i + 20].pack(side="left", padx=3, anchor="w")
             cal.Label(resultFrame, text=dictionary_of_association_from_database[dt]["resistance"],
-                      width=5).pack(
+                      width=4).pack(
                 side="left",
                 padx=3,
                 anchor="w")
             cal.Label(resultFrame, text=str(dictionary_of_association_from_database[dt]["susceptible"]),
-                      width=5).pack(
+                      width=4).pack(
                 side="left",
                 padx=3,
                 anchor="w")
@@ -397,11 +403,11 @@ def result_report():
             global global_top_window_tkinter
             global_top_window_tkinter.destroy()
 
-        cal.Button(cFrame, image=okImg, padding=10, command=savedata).pack(side=RIGHT, pady=10)
+        cal.Button(cFrame, image=okImg, padding=dimensionPadding, command=savedata).pack(side=RIGHT, pady=10)
         newzonead = str(global_sample_id_from_database) + "/zone_adj/" + str(global_sample_id_from_database) + ".png"
         newfoundad = imglocationhome + "zonesfoundIm" + str(global_sample_id_from_database) + ".png"
         global_image = Image.open(newzonead) if os.path.exists(newzonead) else Image.open(newfoundad)
-        global_image = global_image.resize((300, 300), Image.ANTIALIAS)
+        global_image = global_image.resize((500, 500), Image.ANTIALIAS)
         global_scale_image = ImageTk.PhotoImage(global_image)
         cal.Label(cFrame, image=global_scale_image).pack(pady=10)
         cFrame.pack()
@@ -515,13 +521,13 @@ def result_report():
     set_window_icon_and_make_fullscreen(global_top_window_tkinter)
     abxFrame = cal.Frame(global_top_window_tkinter, relief=SOLID, padding=20)
     cal.Label(global_top_window_tkinter, text="Result Report").pack(pady=10)
-    anEntry = cal.Entry(abxFrame, width=dimensionPadding+3)
+    anEntry = cal.Entry(abxFrame, width=dimensionPadding + 3)
     anEntry.pack(ipady=10, pady=10)
 
     listViewFrame = cal.Frame(abxFrame)
     scrollbar = Scrollbar(listViewFrame)
-    scrollbar.pack(side=RIGHT, fill=Y, ipadx=20)
-    anListbox = Listbox(listViewFrame, width=dimensionPadding, height=10,
+    scrollbar.pack(side=RIGHT, fill=Y, ipadx=dimensionPadding)
+    anListbox = Listbox(listViewFrame, width=dimensionWidth ,font = ('TkDefaultFont',48), height=8,
                         yscrollcommand=scrollbar.set)
     listboxupdate(s_list, anListbox, False)
     scrollbar.config(command=anListbox.yview)
@@ -532,8 +538,8 @@ def result_report():
     anListbox.bind("<Double-Button-1>", lambda e: threading.Thread(target=get_info).start())
     anListbox.bind("<Return>", lambda e: threading.Thread(target=get_info).start())
     anListbox.pack()
-    btns[0] = cal.Button(abxFrame, image=backImg, padding=20, command=global_top_window_tkinter.destroy)
-    btns[1] = cal.Button(abxFrame, image=proceedImg, padding=20,
+    btns[0] = cal.Button(abxFrame, image=backImg, padding=dimensionWidth, command=global_top_window_tkinter.destroy)
+    btns[1] = cal.Button(abxFrame, image=proceedImg, padding=dimensionWidth,
                          command=lambda: threading.Thread(target=get_info).start())
     btns[0].pack(side=LEFT, pady=10)
     btns[1].pack(side=RIGHT, pady=10)
@@ -550,7 +556,6 @@ def start_test():
     # noinspection PyShadowingNames
     def proceedtophoto():
         try:
-
             global global_unique_code, error
             global_unique_code = entryField.get().upper().replace("$", "")
             # threading.Thread(target=setprogress, args=[1]).start()
@@ -567,7 +572,7 @@ def start_test():
             cal.Label(valHolder, text="Confirm discs  - Antibiotics for " + global_isolate_name).pack(pady=20)
             discabxFrame = cal.Frame(valHolder, relief=SOLID, padding=30)
             global_image = Image.open(imglocationhome + tmpdiscfoundimg + "discsfound.png")
-            global_image = global_image.resize((600, 600), Image.ANTIALIAS)
+            global_image = global_image.resize((900, 900), Image.ANTIALIAS)
             global_scale_image = ImageTk.PhotoImage(global_image)
 
             def anproceed():
@@ -617,13 +622,13 @@ def start_test():
                 abxFrame = cal.Frame(global_top_window_tkinter, relief=SOLID, padding=20)
                 cal.Label(global_top_window_tkinter,
                           text="Change antibiotic for  disk." + str(dictionary_of_antibiotics) + "").pack(pady=10)
-                anEntry = cal.Entry(abxFrame, width=dimensionPadding+3)
+                anEntry = cal.Entry(abxFrame, width=dimensionPadding + 3)
                 anEntry.pack(ipady=10, pady=10)
                 listViewFrame = cal.Frame(abxFrame)
                 scrollbar = Scrollbar(listViewFrame)
-                anListbox = Listbox(listViewFrame, width=dimensionPadding, height=10,
+                anListbox = Listbox(listViewFrame,width=dimensionWidth ,font = ('TkDefaultFont',48), height=8,
                                     yscrollcommand=scrollbar.set)
-                scrollbar.pack(side=RIGHT, fill=Y, ipadx=20)
+                scrollbar.pack(side=RIGHT, fill=Y, ipadx=dimensionPadding)
                 scrollbar.config(command=anListbox.yview)
                 listboxupdate(list_of_antibiotic_match_with_isolate, anListbox)
                 listViewFrame.pack()
@@ -633,9 +638,9 @@ def start_test():
                 anListbox.bind("<Double-Button-1>", lambda e: bacteria_change())
                 anListbox.bind("<Return>", lambda e: bacteria_change())
                 anListbox.pack()
-                cal.Button(abxFrame, image=backImg, padding=20, command=global_top_window_tkinter.destroy).pack(
+                cal.Button(abxFrame, image=backImg, padding=dimensionPadding, command=global_top_window_tkinter.destroy).pack(
                     side=LEFT, pady=10)
-                cal.Button(abxFrame, image=okImg, padding=20, command=bacteria_change).pack(side=RIGHT,
+                cal.Button(abxFrame, image=okImg, padding=dimensionPadding, command=bacteria_change).pack(side=RIGHT,
                                                                                             pady=10)
                 anEntry.pack()
                 abxFrame.pack()
@@ -653,8 +658,8 @@ def start_test():
                 disclabeldict[i] = cal.Label(discabxL, width=35,
                                              text="Disc " + str(i) + "." + dictionary_of_antibiotic_discs_from_database[
                                                  i])
-                disclabeldict[i].pack(anchor='w', pady=0)
-                disclabeldict[i].bind("<Double-Button-1>",
+                disclabeldict[i].pack(anchor='w', pady=10)
+                disclabeldict[i].bind("<Button-1>",
                                       lambda eventhandle, akey=i, aname=disclabeldict[i]: change_antibiotic_name(aname,
 
                                                                                                                  akey))
@@ -694,7 +699,6 @@ def start_test():
                     exceptionprint("insertTestData0", _ehttp)
 
                 closewindows()
-                threading.Thread(target=setprogress, args=[4]).start()
 
                 # noinspection PyShadowingNames
                 def singleTestProgressing(global_sample_id_from_database):
@@ -711,10 +715,10 @@ def start_test():
                     cal.Label(generalOpt, text="Antibiotics", width=20).pack(side="left", padx=3,
                                                                              anchor="w")
                     cal.Label(generalOpt, text="Code", width=7).pack(side="left", padx=3, anchor="w")
-                    cal.Label(generalOpt, text="Dose", width=10).pack(side="left", padx=3, anchor="w")
-                    cal.Label(generalOpt, text="Zones (mm)", width=10).pack(side="left", padx=3, anchor="w")
-                    cal.Label(generalOpt, text="R<", width=5).pack(side="left", padx=3, anchor="w")
-                    cal.Label(generalOpt, text="S≥", width=5).pack(side="left", padx=3, anchor="w")
+                    cal.Label(generalOpt, text="Dose", width=6).pack(side="left", padx=3, anchor="w")
+                    cal.Label(generalOpt, text="Zones", width=6).pack(side="left", padx=3, anchor="w")
+                    cal.Label(generalOpt, text="R<", width=4).pack(side="left", padx=3, anchor="w")
+                    cal.Label(generalOpt, text="S≥", width=4).pack(side="left", padx=3, anchor="w")
                     cal.Label(generalOpt, text="Interpretation", width=15).pack(side="left", padx=3,
                                                                                 anchor="w")
                     generalOpt.pack()
@@ -722,7 +726,11 @@ def start_test():
                     i = 0
                     generalOpt = {}
 
-                    global dictionary_of_discs_from_database, dictionary_of_association_from_database
+                    try:
+                        btns[0]["state"] = "enabled"
+                        btns[1]["state"] = "enabled"
+                    except Exception as _wd:
+                        exceptionprint("widgets", _wd)
 
                     for dt in dictionary_of_discs_from_database:
                         resultFrame = cal.Frame(cFrame, padding=5, relief=SOLID)
@@ -740,21 +748,21 @@ def start_test():
                             anchor="w")
 
                         cal.Label(resultFrame, text=str(dictionary_of_discs_from_database[dt][2]),
-                                  width=10).pack(
+                                  width=6).pack(
                             side="left",
                             padx=3,
                             anchor="w")
                         generalOpt[i + 20] = cal.Label(resultFrame,
-                                                       text=str(dictionary_of_discs_from_database[dt][3]),
-                                                       width=10)
+                                                       text=str(dictionary_of_discs_from_database[dt][3]) + "mm",
+                                                       width=6)
                         generalOpt[i + 20].pack(side="left", padx=3, anchor="w")
                         cal.Label(resultFrame, text=dictionary_of_association_from_database[dt]["resistance"],
-                                  width=5).pack(
+                                  width=4).pack(
                             side="left",
                             padx=3,
                             anchor="w")
                         cal.Label(resultFrame, text=str(dictionary_of_association_from_database[dt]["susceptible"]),
-                                  width=5).pack(
+                                  width=4).pack(
                             side="left",
                             padx=3,
                             anchor="w")
@@ -843,8 +851,9 @@ def start_test():
                                     zones_adj = adjust_zones(zones, int(dsc) - 1, mm * int(amount))
                                     save_zones(zones_adj, zadjs_path)
 
-                                elif not os.path.exists(imgbase + str(global_sample_id_from_database) + "/zones_adj/" + str(
-                                        global_sample_id_from_database) + ".txt"):
+                                elif not os.path.exists(
+                                        imgbase + str(global_sample_id_from_database) + "/zones_adj/" + str(
+                                            global_sample_id_from_database) + ".txt"):
                                     zones = load_zones(zones_path)
                                     zones_adj = adjust_zones(zones, int(dsc) - 1, mm * int(amount))
                                     save_zones(zones_adj, zadjs_path)
@@ -890,7 +899,7 @@ def start_test():
                                     global_sample_id_from_database) + ".png"
                                 imagefx = Image.open(newzonead) if os.path.exists(newzonead) else Image.open(newfoundad)
 
-                                imagefx = imagefx.resize((500, 500), Image.ANTIALIAS)
+                                imagefx = imagefx.resize((700, 700), Image.ANTIALIAS)
                                 imagefxs = ImageTk.PhotoImage(imagefx)
                                 try:
                                     generals[1]["image"] = imagefxs
@@ -908,7 +917,7 @@ def start_test():
                         imagefx = Image.open(newzonead) if os.path.exists(newzonead) else Image.open(newfoundad)
 
                         g = 0
-                        imagefx = imagefx.resize((500, 500), Image.ANTIALIAS)
+                        imagefx = imagefx.resize((700, 700), Image.ANTIALIAS)
                         imagefxs = ImageTk.PhotoImage(imagefx)
                         imframe = cal.Frame(eFrame)
                         generals[g + 1] = cal.Label(imframe, image=imagefxs)
@@ -922,17 +931,20 @@ def start_test():
                         generals[g + 5].pack(padx=2)
                         generals[g + 2] = cal.Combobox(bFrame, width=20, values=combodropAmount, state="readonly")
                         generals[g + 2].set("Amount")
-                        generals[g + 3] = cal.Button(bFrame, image=plusImg, width=20, padding=20)
+                        generals[g + 3] = cal.Button(bFrame, image=plusImg, width=20, padding=dimensionPadding)
                         generals[g + 3].bind("<Button-1>",
                                              lambda event: cAdjust(generals[g + 2].get(), generals[g + 5].get(), True))
-                        generals[g + 4] = cal.Button(bFrame, image=minusImg, width=20, padding=20)
+                        generals[g + 4] = cal.Button(bFrame, image=minusImg, width=20, padding=dimensionPadding)
                         generals[g + 4].bind("<Button-1>",
                                              lambda event: cAdjust(generals[g + 2].get(), generals[g + 5].get(), False))
+                        
                         generals[g + 4].pack(side=LEFT, padx=2)
                         generals[g + 2].pack(pady=10, ipady=3, padx=20, side=LEFT)
                         generals[g + 3].pack(side=LEFT, padx=2)
-                        imframe.pack(side=LEFT)
-                        bFrame.pack(side=RIGHT)
+                        
+                        
+
+                        
 
                         # noinspection PyShadowingNames
                         def callback():
@@ -949,9 +961,11 @@ def start_test():
                                              args=[global_sample_id_from_database]).start()
 
                         eFrame.pack()
-                        cal.Button(baseFrame, image=okImg, width=20, padding=20, command=callback).pack(
+                        cal.Button(baseFrame, image=okImg, width=20, padding=dimensionPadding, command=callback).pack(
                             pady=3)
                         baseFrame.pack()
+                        imframe.pack()
+                        bFrame.pack()
 
                     def savedata():
                         global global_top_window_tkinter, incount
@@ -985,9 +999,9 @@ def start_test():
                         if incount:
                             threading.Thread(target=finish).start()
 
-                    cal.Button(cFrame, image=okImg, padding=10, command=savedata).pack(side=RIGHT, pady=10)
+                    cal.Button(cFrame, image=okImg, padding=dimensionPadding, command=savedata).pack(side=RIGHT, pady=10)
 
-                    modify = cal.Button(cFrame, image=editImg, padding=10, state="disabled", command=adjustTest)
+                    modify = cal.Button(cFrame, image=editImg, padding=dimensionPadding, state="disabled", command=adjustTest)
                     modify.pack(side=LEFT, pady=10)
 
                     newzonead = imgbase + str(global_sample_id_from_database) + "/zone_adj/" + str(
@@ -1007,7 +1021,7 @@ def start_test():
                     threading.Thread(target=imgdown).start()
 
                     global_image = Image.open(newzonead) if os.path.exists(newzonead) else Image.open(newfoundad)
-                    global_image = global_image.resize((300, 300), Image.ANTIALIAS)
+                    global_image = global_image.resize((500, 500), Image.ANTIALIAS)
                     global_scale_image = ImageTk.PhotoImage(global_image)
 
                     cal.Label(cFrame, image=global_scale_image).pack(pady=10)
@@ -1026,7 +1040,6 @@ def start_test():
                                 break
                         except Exception as e_ge:
                             exceptionprint("getsampleId", e_ge)
-
                     try:
                         while True:
                             c_data = http_get_request("getCompletedTestData",
@@ -1071,10 +1084,33 @@ def start_test():
                             for j in http_request_return_json_or_boolean(file="getTestStatus", param={},
                                                                          return_data=True).json()["teststatus"]:
                                 if j["status"] == "6":
-                                    threading.Thread(target=setprogress, args=[7]).start()
+                                    setprogress(7)
+                                    dists = {}
+                                    index = 1
+                                    if returnTrue("deleteZoneIfFound", {"sample_id": global_sample_id_from_database}):
+                                        for meta in http_request_return_json_or_boolean(
+                                                file="get_zone_finder_data", param={},
+                                                return_data=True).json()["metadata"]:
+                                            dists[index] = meta["diameter"]
+                                            returnTrue("insertTestZone",
+                                                       {"discs": str(meta["disc_pos"]),
+                                                        "sample_id": global_sample_id_from_database})
+                                            index += 1
 
-                                    # downloadImg(global_sample_id_from_database, "_zonesfoundIm", "zonesfoundIm",
-                                    #             False)
+                                    for d, disc_num in zip(dists, http_request_return_json_or_boolean(
+                                            file="getDiscId", param={"sample_id": global_sample_id_from_database},
+                                            return_data=True).json()["discs"]):
+                                        updateDiscdata = {"distances": (dists[d]),
+                                                          "sample_id": global_sample_id_from_database,
+                                                          "disc_num": disc_num["disc_id"]}
+                                        returnTrue("updateDisc", updateDiscdata)
+
+                                    oldpath = imgbase + str(global_sample_id_from_database) + "/zones_rgb/" + str(
+                                        global_sample_id_from_database) + ".png"
+                                    topath = imglocationhome + "zonesfoundIm" + str(
+                                        global_sample_id_from_database) + ".png"
+
+                                    shutil.copy(oldpath, topath)
 
                                     rgb_dir = Path(r'' + imgbase + str(global_sample_id_from_database) + '/rgb')
                                     zone_dir = Path(r'' + imgbase + str(global_sample_id_from_database) + '/zone')
@@ -1088,11 +1124,6 @@ def start_test():
                                               zadjs_dir,
                                               zadj_dir]:
                                         d.mkdir(parents=True, exist_ok=True)
-
-                                    # wget.download(
-                                    #     domain + "img/_zonesfor" + str(global_sample_id_from_database) + ".txt",
-                                    #     str(global_sample_id_from_database) + "/zones/" + str(
-                                    #         global_sample_id_from_database) + ".txt")
 
                                     d_tem = {}
                                     c = 0
@@ -1188,13 +1219,6 @@ def start_test():
                                             except Exception as _ee:
                                                 exceptionprint("discl", _ee)
 
-                                        # downloadImg(global_sample_id_from_database, "_", "Im", False)
-                                        #
-                                        # shutil.move(
-                                        #     imglocationhome + "Im" + str(global_sample_id_from_database) + ".png",
-                                        #     str(global_sample_id_from_database) + "/rgb/" + str(
-                                        #         global_sample_id_from_database) + ".png")
-
                                     incount = False
                                     threading.Thread(target=imdown).start()
                                     threading.Thread(target=singleTestProgressing,
@@ -1215,18 +1239,18 @@ def start_test():
                 img = np.clip(img, 0, 255)
                 cv2.imwrite(imglocationhome + "/discsfound/discsfound_bright.png", np.uint8(img))
                 global_image = Image.open(imglocationhome + "/discsfound/discsfound_bright.png")
-                global_image = global_image.resize((600, 600), Image.ANTIALIAS)
+                global_image = global_image.resize((900, 900), Image.ANTIALIAS)
                 global_scale_image = ImageTk.PhotoImage(global_image)
                 generals[10]["image"] = global_scale_image
 
             discOptFrame = cal.Frame(discabxFrame)
-            cal.Button(discOptFrame, image=backImg, padding=20, command=valHolder.destroy).pack(pady=10, padx=20,
+            cal.Button(discOptFrame, image=backImg, padding=dimensionPadding, command=valHolder.destroy).pack(pady=10, padx=20,
                                                                                                 side=LEFT)
-            cal.Button(discOptFrame, text="Brighten Image", padding=20,
+            cal.Button(discOptFrame, text="Brighten Image", padding=dimensionPadding,
                        command=lambda: threading.Thread(target=brightImg).start()).pack(pady=10, side=LEFT)
 
             # noinspection PyTypeChecker
-            generals[12] = cal.Button(discOptFrame, image=proceedImg, padding=20, state="disabled")
+            generals[12] = cal.Button(discOptFrame, image=proceedImg, padding=dimensionPadding, state="disabled")
             generals[12].pack(pady=10, padx=20, side=LEFT)
             nomatchfound(dictionary_of_antibiotic_discs_from_database)
             discabxFrame.pack()
@@ -1332,7 +1356,8 @@ def start_test():
                         for state in http_request_return_json_or_boolean(file="getTestStatus", param={},
                                                                          return_data=True).json()[
                             "teststatus"]:
-                            if state["status"] == "2":
+                            if state["started"] == "2":
+                                set_test_phase(3, started=True)
                                 while True:
                                     if os.path.exists(imglocationhome + tmpdiscfoundimg + "discsfound.png"):
                                         imageprocessdone()
@@ -1364,14 +1389,15 @@ def start_test():
         set_window_icon_and_make_fullscreen(isolatewindow)
         cal.Label(isolatewindow, text="Choose isolate").pack(pady=20)
         isoSelectFrame = cal.Frame(isolatewindow, relief=SOLID, padding=30)
-        isolateEntry = cal.Entry(isoSelectFrame, width=dimensionPadding+3, justify="center")
+        isolateEntry = cal.Entry(isoSelectFrame, width=dimensionPadding + 3, justify="center")
         isolateEntry.insert(0, "Enter isolate name here")
         isolateEntry.bind("<FocusIn>", lambda event: clear_Input(isolateEntry))
         isolateEntry.pack(ipady=10)
         listViewFrame = cal.Frame(isoSelectFrame)
         scrollbar = Scrollbar(listViewFrame)
-        scrollbar.pack(side=RIGHT, fill=Y, ipadx=20)
-        isolateListBox = Listbox(listViewFrame, width=dimensionPadding,
+        scrollbar.pack(side=RIGHT, fill=Y, ipadx=dimensionPadding)
+        #font = ('TkDefaultFont',40),
+        isolateListBox = Listbox(listViewFrame, width=dimensionWidth ,font = ('TkDefaultFont',48), height=8, 
                                  yscrollcommand=scrollbar.set)
         listboxupdate(isolate_list_from_database, isolateListBox)
         scrollbar.config(command=isolateListBox.yview)
@@ -1379,11 +1405,11 @@ def start_test():
         isolateEntry.bind("<KeyRelease>", lambda e, box=isolateListBox: toListbox(e, box, isolate_list_from_database))
         isolateListBox.bind("<<ListboxSelect>>", lambda event, efield=isolateEntry: itemselected(event, efield, True))
         isolateListBox.pack()
-        generalOpt = {i: cal.Button(isoSelectFrame, image=backImg, padding=10, command=isolatewindow.destroy),
-                      i + 1: cal.Button(isoSelectFrame, image=proceedImg, padding=10),
+        generalOpt = {i: cal.Button(isoSelectFrame, image=backImg, padding=dimensionPadding, command=isolatewindow.destroy),
+                      i + 1: cal.Button(isoSelectFrame, image=proceedImg, padding=dimensionPadding),
                       i + 2: Label(isoSelectFrame, text="Preparing for zone detection"),
-                      i + 3: cal.Button(isoSelectFrame, image=okImg, padding=10, command=proceedtophoto),
-                      i + 4: cal.Button(isoSelectFrame, image=backImg, padding=10,
+                      i + 3: cal.Button(isoSelectFrame, image=okImg, padding=dimensionPadding, command=proceedtophoto),
+                      i + 4: cal.Button(isoSelectFrame, image=backImg, padding=dimensionPadding,
                                         command=global_top_window_tkinter.destroy)
                       }
         generalOpt[i + 2].pack(pady=10)
@@ -1395,7 +1421,7 @@ def start_test():
     widgets = {}
 
     def picamera():
-        setlink(3)
+        setlink(2)
         loop_back = 1
         while loop_back:
             try:
@@ -1405,6 +1431,7 @@ def start_test():
                     if state["link"] == "2":
                         loop_back = 0
                         setlink(0)
+                        set_test_phase(1, started=True)
                         proceedtophoto()
             except Exception as _es:
                 exceptionprint("picamera", _es)
@@ -1432,10 +1459,11 @@ def start_test():
                     isolate_list_from_database = list(set(listTemp))
 
                     #  Skip Pi camera trigger
-                    proceedtophoto()
+                    #set_test_phase(1, started=True)
+                    #proceedtophoto()
 
                     # Pi camera trigger
-                    # threading.Thread(target=picamera).start()
+                    threading.Thread(target=picamera).start()
 
                     break
                 except Exception as e_:
@@ -1454,10 +1482,10 @@ def start_test():
     entryField.pack(ipady=9)
     entryField.focus()
     optButtons = cal.Frame(startTestFrame)
-    widgets[0] = cal.Button(optButtons, image=backImg, padding=20,
+    widgets[0] = cal.Button(optButtons, image=backImg, padding=dimensionPadding,
                             command=global_top_window_tkinter_sp.destroy)
-    widgets[1] = cal.Button(optButtons, text="CLEAR", width=20, padding=20)
-    widgets[2] = cal.Button(optButtons, image=proceedImg, padding=20)
+    widgets[1] = cal.Button(optButtons, text="CLEAR", width=20, padding=dimensionPadding)
+    widgets[2] = cal.Button(optButtons, image=proceedImg, padding=dimensionPadding)
 
     def place_image_remainder():
         global global_top_window_tkinter
@@ -1466,7 +1494,7 @@ def start_test():
         set_window_icon_and_make_fullscreen(global_top_window_tkinter)
         remainder_frame = cal.Frame(global_top_window_tkinter, padding=20)
         cal.Label(remainder_frame, text="Place petri dish in the instrument then proceed").pack(pady=40)
-        cal.Button(remainder_frame, padding=20,
+        cal.Button(remainder_frame, padding=dimensionPadding,
                    image=proceedImg, command=wait_for_image_capture).pack()
         remainder_frame.pack()
 
@@ -1510,7 +1538,7 @@ if __name__ == '__main__':
     dictionary_of_association_from_database = {}
 
     cwdpath = "php-scripts/"
-    url = "http://localhost:8085/open-amr/"
+    url = "http://localhost/open-amr/"
     domain = url + cwdpath
     imgurl = domain + "img/_discsfound_tryimg.png"
     discs_table = """ CREATE TABLE IF NOT EXISTS discs (
@@ -1530,7 +1558,7 @@ if __name__ == '__main__':
     base = Tk()
     base.title("Open-AMR Susceptibility Testing - Debug")
     font = nametofont("TkDefaultFont")
-    font.configure(size=20)
+    font.configure(size=37)
     base.option_add("*Font", font)
 
     # Image home directory
